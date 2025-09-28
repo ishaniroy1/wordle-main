@@ -1,0 +1,41 @@
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.bbl
+*.blg
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules/
+
+# Temporary files
+*.tmp
+*~
+
+README.md
+
+# Instructor-only files (DO NOT SHARE WITH STUDENTS)
+instructor-guide.tex
+instructor-guide.pdf
+instructor-guide.aux
+instructor-guide.log
+instructor-guide.out

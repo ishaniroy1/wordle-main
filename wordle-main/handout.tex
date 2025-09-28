@@ -1,0 +1,487 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{booktabs}
+
+% Code listing style
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Wordle Clone Assignment}
+\lhead{Web Development}
+\cfoot{\thepage}
+
+% Title formatting
+\title{\textbf{CS390 - Mini Project 1}}
+\author{Tanay Gondil}
+\date{Due: September 27th, 2025}
+
+\begin{document}
+
+\maketitle
+
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=\textbf{Assignment Overview}]
+Create a fully functional Wordle clone by implementing core game logic in JavaScript. You will work with provided HTML, CSS, and starter code to build an interactive word-guessing game with animations and user feedback.
+\end{tcolorbox}
+
+\section{Learning Objectives}
+
+By completing this assignment, you will demonstrate proficiency in:
+
+\begin{itemize}[itemsep=0.5em]
+    \item \textbf{DOM Manipulation}: Dynamically updating HTML elements with JavaScript
+    \item \textbf{Event Handling}: Responding to keyboard and mouse interactions
+    \item \textbf{Game Logic}: Implementing complex conditional logic and state management
+    \item \textbf{Array \& String Operations}: Processing and comparing text data
+    \item \textbf{Function Design}: Breaking problems into manageable, reusable functions
+    \item \textbf{UI Feedback}: Providing clear visual feedback to players
+    \item \textbf{Data Validation}: Ensuring user input meets game requirements
+\end{itemize}
+
+\section{Game Rules \& Mechanics}
+
+\subsection{Basic Wordle Rules}
+\begin{enumerate}[itemsep=0.3em]
+    \item Players have \textbf{6 attempts} to guess a \textbf{5-letter word}
+    \item Each guess must be a valid English word
+    \item After each guess, letters are color-coded:
+    \begin{itemize}
+        \item \textcolor{green}{\textbf{Green}}: Letter is correct and in the right position
+        \item \textcolor{orange}{\textbf{Yellow}}: Letter is in the word but wrong position
+        \item \textcolor{gray}{\textbf{Gray}}: Letter is not in the word
+    \end{itemize}
+    \item The on-screen keyboard updates to show letter states
+    \item Game ends when word is guessed or 6 attempts are used
+\end{enumerate}
+
+\subsection{Advanced Mechanics}
+\begin{itemize}[itemsep=0.3em]
+    \item \textbf{Duplicate Letters}: Handle multiple instances of the same letter correctly
+    \item \textbf{Visual Effects}: Simple celebrations and feedback
+    \item \textbf{Statistics}: Track games played, win percentage, and streaks
+    \item \textbf{Input Validation}: Prevent invalid inputs and provide feedback
+\end{itemize}
+
+\section{Implementation Requirements}
+
+\subsection{Core Game Functions (60 points)}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}lcp{8cm}@{}}
+\toprule
+\textbf{Function} & \textbf{Points} & \textbf{Requirements} \\
+\midrule
+\texttt{initializeGame()} & 10 & Reset game state, select random word, clear board \\
+\texttt{handleKeyPress()} & 15 & Process keyboard input (letters, Enter, Backspace) \\
+\texttt{submitGuess()} & 20 & Validate guess, check letters, update display \\
+\texttt{checkLetter()} & 10 & Implement Wordle letter-checking logic \\
+\texttt{updateGameState()} & 5 & Handle win/lose conditions, update variables \\
+\bottomrule
+\end{tabular}
+\caption{Core Function Requirements}
+\end{table}
+
+\subsubsection{Function Details}
+
+\paragraph{\texttt{initializeGame()}} 
+\textbf{Goal:} Set up a fresh game ready for the player to start guessing.
+\begin{itemize}
+    \item Reset all tracking variables (\texttt{currentWord}, \texttt{currentGuess}, \texttt{currentRow}, etc.)
+    \item Pick a new target word using \texttt{WordleWords.getRandomWord()}
+    \item Clear the visual game board using the provided \texttt{resetBoard()} function
+    \item Hide any leftover messages or modals from previous games
+\end{itemize}
+\textit{Think of this as the "New Game" button functionality.}
+
+\paragraph{\texttt{handleKeyPress(key)}} 
+\textbf{Goal:} Process what happens when a player types on their keyboard or clicks the on-screen keys.
+\begin{itemize}
+    \item \textbf{Letter keys (A-Z):} Add the letter to the current guess if there's room (less than 5 letters)
+    \item \textbf{ENTER key:} Try to submit the current guess if it's complete (exactly 5 letters)
+    \item \textbf{BACKSPACE key:} Remove the last letter from the current guess if there are any letters
+    \item Update the visual display of tiles after each change
+\end{itemize}
+\textit{This is like being the "translator" between user input and game actions.}
+
+\paragraph{\texttt{submitGuess()}} 
+\textbf{Goal:} Process a complete 5-letter guess and give feedback to the player.
+\begin{itemize}
+    \item First, check if the guess is a real English word using \texttt{WordleWords.isValidWord()}
+    \item If invalid, show an error message and shake the row
+    \item If valid, compare each letter to the target word using \texttt{checkLetter()}
+    \item Update tile colors (green/yellow/gray) and keyboard colors based on results
+    \item Apply colors immediately to provide instant feedback
+    \item Check if the player won or lost, then move to the next row
+\end{itemize}
+\textit{This is the "heart" of Wordle - where guesses get evaluated.}
+
+\paragraph{\texttt{checkLetter(letter, position, target)}} 
+\textbf{Goal:} Determine the color (status) of a single letter in a guess.
+\begin{itemize}
+    \item Return \texttt{'correct'} if the letter matches the target word at this exact position (green)
+    \item Return \texttt{'present'} if the letter exists in the target word but at a different position (yellow)  
+    \item Return \texttt{'absent'} if the letter doesn't exist anywhere in the target word (gray)
+    \item \textbf{Challenge:} Handle duplicate letters correctly (e.g., if target is "SPEED" and guess is "ERASE", how many E's should be yellow vs gray?)
+\end{itemize}
+\textit{This implements the core Wordle logic that everyone recognizes.}
+
+\paragraph{\texttt{updateGameState(isCorrect)}} 
+\textbf{Goal:} Decide if the game should continue or end after a guess.
+\begin{itemize}
+    \item If the guess was correct, set \texttt{gameWon = true} and \texttt{gameOver = true}
+    \item If this was the 6th guess and still wrong, set \texttt{gameOver = true}
+    \item Show the appropriate end-game modal with results
+    \item Update game statistics (wins, streaks, etc.)
+\end{itemize}
+\textit{This handles the "What happens next?" decision after each guess.}
+
+\subsection{Advanced Features (30 points)}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}lcp{8cm}@{}}
+\toprule
+\textbf{Function} & \textbf{Points} & \textbf{Requirements} \\
+\midrule
+\texttt{updateKeyboardColors()} & 10 & Update keyboard with color priority \\
+\texttt{processRowReveal()} & 5 & Handle row completion effects (simplified) \\
+\texttt{showEndGameModal()} & 10 & Display results and statistics \\
+\texttt{validateInput()} & 5 & Prevent invalid actions and edge cases \\
+\bottomrule
+\end{tabular}
+\caption{Advanced Feature Requirements}
+\end{table}
+
+\subsubsection{Advanced Function Details}
+
+\paragraph{\texttt{updateKeyboardColors(guess, results)}} 
+\textbf{Goal:} Keep the on-screen keyboard updated with color hints from previous guesses.
+\begin{itemize}
+    \item Loop through each letter in the guess and its corresponding result
+    \item Update the keyboard key color using the provided \texttt{updateKeyboardKey()} function
+    \item Remember: colors have priority (green > yellow > gray) - don't downgrade a key
+    \item This gives players visual feedback about which letters they've tried
+\end{itemize}
+\textit{This creates the helpful "memory" effect where used letters stay colored.}
+
+\paragraph{\texttt{processRowReveal(rowIndex, results)}} 
+\textbf{Goal:} Handle any special effects when a row is completed (simplified, no animations).
+\begin{itemize}
+    \item Check if the guess was completely correct (all results are 'correct')
+    \item If so, trigger a celebration effect using the provided \texttt{celebrateRow()} function
+    \item Focus on the core logic rather than visual effects
+\end{itemize}
+\textit{This handles the "you won!" celebration moment.}
+
+\paragraph{\texttt{showEndGameModal(won, targetWord)}} 
+\textbf{Goal:} Display the game results when the player wins or loses.
+\begin{itemize}
+    \item Update the game statistics using the provided \texttt{updateStats()} function
+    \item Show the modal with appropriate win/lose message
+    \item Display the target word so players can see what it was
+    \item Calculate and show how many guesses were used (if won)
+    \item Use the provided \texttt{showModal()} function with proper parameters
+\end{itemize}
+\textit{This creates the final "reveal" and gives players their results.}
+
+\paragraph{\texttt{validateInput(key, currentGuess)}} 
+\textbf{Goal:} Prevent invalid actions before they cause problems.
+\begin{itemize}
+    \item Check if the game is already over (no input allowed)
+    \item For letter keys: ensure the current guess isn't already full (5 letters)
+    \item For ENTER key: ensure the current guess is complete (exactly 5 letters)
+    \item For BACKSPACE key: ensure there are letters to remove
+    \item Return \texttt{true} if the input is valid, \texttt{false} otherwise
+\end{itemize}
+\textit{This prevents confusing situations and makes the game feel polished.}
+
+\section{Technical Specifications}
+
+\subsection{Available Resources}
+
+You have access to the following pre-built functionality:
+
+\begin{itemize}[itemsep=0.3em]
+    \item \textbf{DOM Elements}: All game tiles, keyboard keys, and UI components
+    \item \textbf{Utility Functions}: \texttt{getTile()}, \texttt{updateTileDisplay()}, \texttt{setTileState()}, etc.
+    \item \textbf{Word Management}: \texttt{WordleWords.getRandomWord()}, \texttt{WordleWords.isValidWord()}
+    \item \textbf{Effect Helpers}: \texttt{shakeRow()}, \texttt{celebrateRow()}
+    \item \textbf{State Variables}: \texttt{currentWord}, \texttt{currentGuess}, \texttt{currentRow}, etc.
+\end{itemize}
+
+\subsection{Key Algorithms}
+
+\subsubsection{Letter Checking Algorithm}
+The most complex part of Wordle is handling duplicate letters correctly:
+
+\begin{lstlisting}
+// Pseudocode for handling duplicates
+function checkLetter(guess, position, target) {
+    if (target[position] === guess[position]) {
+        return 'correct';
+    }
+    
+    // Count available instances of this letter
+    // (not already marked as correct)
+    
+    if (letterAvailable) {
+        return 'present';
+    }
+    
+    return 'absent';
+}
+\end{lstlisting}
+
+\subsubsection{Game Flow Sequence}
+Game actions must be properly sequenced:
+
+\begin{enumerate}
+    \item User submits guess
+    \item Validate word (shake if invalid)
+    \item Update tile colors immediately
+    \item Update keyboard colors
+    \item Check win/lose conditions
+    \item Show celebration or end-game modal
+\end{enumerate}
+
+\section{Implementation Examples \& Scenarios}
+
+\subsection{Understanding the Game Flow}
+Here's what happens in a typical Wordle game to help you understand the function interactions:
+
+\begin{enumerate}
+    \item \textbf{Game starts:} \texttt{initializeGame()} sets up everything
+    \item \textbf{Player types "A":} \texttt{handleKeyPress("A")} adds it to current guess
+    \item \textbf{Player types "B", "O", "U", "T":} Each call to \texttt{handleKeyPress()} builds the word
+    \item \textbf{Player presses ENTER:} \texttt{handleKeyPress("ENTER")} calls \texttt{submitGuess()}
+    \item \textbf{Word gets checked:} \texttt{submitGuess()} calls \texttt{checkLetter()} for each letter
+    \item \textbf{Colors revealed:} \texttt{processRowReveal()} handles any celebration effects
+    \item \textbf{Keyboard updated:} \texttt{updateKeyboardColors()} marks used letters
+    \item \textbf{Game continues or ends:} \texttt{updateGameState()} decides what's next
+\end{enumerate}
+
+\subsection{Duplicate Letter Examples}
+The trickiest part is handling duplicate letters correctly. Here are examples:
+
+\begin{itemize}
+    \item \textbf{Target: "SPEED", Guess: "ERASE"} 
+    \begin{itemize}
+        \item E (pos 0): Not in position 0 of SPEED, but E exists → \textcolor{orange}{\textbf{Yellow}}
+        \item R (pos 1): Not in SPEED → \textcolor{gray}{\textbf{Gray}}
+        \item A (pos 2): Not in SPEED → \textcolor{gray}{\textbf{Gray}}
+        \item S (pos 3): Not in position 3 of SPEED, but S exists → \textcolor{orange}{\textbf{Yellow}}
+        \item E (pos 4): Matches position 4 of SPEED → \textcolor{green}{\textbf{Green}}
+    \end{itemize}
+    
+    \item \textbf{Target: "SPEED", Guess: "KEEPS"}
+    \begin{itemize}
+        \item K (pos 0): Not in SPEED → \textcolor{gray}{\textbf{Gray}}
+        \item E (pos 1): Matches position 1 of SPEED → \textcolor{green}{\textbf{Green}}
+        \item E (pos 2): Matches position 2 of SPEED → \textcolor{green}{\textbf{Green}}
+        \item P (pos 3): Matches position 3 of SPEED → \textcolor{green}{\textbf{Green}}
+        \item S (pos 4): Not in position 4, but S exists → \textcolor{orange}{\textbf{Yellow}}
+    \end{itemize}
+\end{itemize}
+
+\section{Testing \& Debugging}
+
+\subsection{Test Cases}
+Your implementation should handle these scenarios correctly:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}llp{6cm}@{}}
+\toprule
+\textbf{Scenario} & \textbf{Input} & \textbf{Expected Behavior} \\
+\midrule
+Valid guess & "ABOUT" & Process guess, update colors \\
+Invalid word & "XYZQW" & Show error, shake row \\
+Duplicate letters & "SPEED" vs "ERASE" & Handle E's correctly \\
+Win condition & Correct guess & Show celebration, modal \\
+Lose condition & 6 wrong guesses & Show game over modal \\
+Keyboard input & Physical keys & Same as on-screen clicks \\
+\bottomrule
+\end{tabular}
+\caption{Required Test Cases}
+\end{table}
+
+\subsection{Debugging Tools}
+The template includes debugging functions (remove before submission):
+\begin{itemize}
+    \item \texttt{window.debug.revealWord()}: Show current target word
+    \item \texttt{window.debug.autoSolve()}: Automatically solve current game
+    \item \texttt{window.debug.gameState()}: Display current game state
+\end{itemize}
+
+\section{Grading Rubric}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Category} & \textbf{Points} & \textbf{Criteria} \\
+\midrule
+Core Game Logic & 60 & Functions work correctly, handle edge cases \\
+Advanced Features & 30 & UI responsive, proper feedback \\
+Code Quality & Bonus & Clean, readable, well-commented \\
+\midrule
+\textbf{Total} & \textbf{90} & \\
+\bottomrule
+\end{tabular}
+\caption{Point Distribution}
+\end{table}
+
+\subsection{Grade Scale}
+\begin{itemize}[itemsep=0.2em]
+    \item \textbf{A (81-90)}: All functions implemented correctly with proper feedback
+    \item \textbf{B (72-80)}: Core logic works, minor issues with advanced features
+    \item \textbf{C (63-71)}: Basic game playable, some functions incomplete
+    \item \textbf{D (54-62)}: Partial implementation, major functionality missing
+    \item \textbf{F (0-53)}: Non-functional or minimal implementation
+\end{itemize}
+
+\section{Submission Guidelines}
+
+\subsection{What to Submit}
+\begin{enumerate}[itemsep=0.3em]
+    \item \textbf{student-implementation.js}: Your completed JavaScript code
+    \item \textbf{README.md}: Brief description of your implementation approach
+    \item \textbf{Screenshots}: Show your working game (win and lose screens)
+\end{enumerate}
+
+\subsection{Before Submission}
+\begin{itemize}[itemsep=0.3em]
+    \item Remove all debugging code and console.log statements
+    \item Test all game scenarios thoroughly
+    \item Ensure code is properly commented
+    \item Verify game feedback works correctly
+    \item Check that statistics persist between games
+\end{itemize}
+
+\section{Common Pitfalls \& Tips}
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=\textbf{Common Mistakes to Avoid}]
+\begin{itemize}[itemsep=0.3em]
+    \item \textbf{Duplicate Letter Logic}: The most common error is incorrectly handling words with repeated letters
+    \item \textbf{Case Sensitivity}: Always convert to uppercase for comparisons
+    \item \textbf{State Timing}: Update game state in the correct sequence
+    \item \textbf{Input Validation}: Check for edge cases like empty inputs or game-over states
+    \item \textbf{Keyboard Priority}: Don't downgrade key colors (green $>$ yellow $>$ gray)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=\textbf{Success Tips}]
+\begin{itemize}[itemsep=0.3em]
+    \item \textbf{Start Simple}: Implement basic functionality before adding animations
+    \item \textbf{Test Frequently}: Use the debug functions to test edge cases
+    \item \textbf{Read Documentation}: Study the provided utility functions carefully
+    \item \textbf{Break Down Problems}: Tackle one function at a time
+    \item \textbf{Use Console}: Log variables to understand program flow
+\end{itemize}
+\end{tcolorbox}
+
+\section{Step-by-Step Implementation Guide}
+
+\subsection{Recommended Implementation Order}
+Follow this sequence to build your Wordle game systematically:
+
+\begin{enumerate}[itemsep=0.5em]
+    \item \textbf{Start with \texttt{initializeGame()}}
+    \begin{itemize}
+        \item This sets up everything and is called when the page loads
+        \item Test by opening the browser console and checking if variables are set
+        \item Use \texttt{window.debug.currentWord()} to verify a word was selected
+    \end{itemize}
+    
+    \item \textbf{Implement basic \texttt{handleKeyPress()}}
+    \begin{itemize}
+        \item Start with just letter keys - add them to \texttt{currentGuess}
+        \item Update the tile display so you can see letters appear
+        \item Add BACKSPACE functionality to remove letters
+        \item Test by typing letters and seeing them appear on the board
+    \end{itemize}
+    
+    \item \textbf{Create simple \texttt{checkLetter()}}
+    \begin{itemize}
+        \item Start with just the basic logic (ignore duplicates for now)
+        \item Test with simple words that don't have duplicate letters
+        \item Use \texttt{console.log()} to verify correct/present/absent results
+    \end{itemize}
+    
+    \item \textbf{Build \texttt{submitGuess()}}
+    \begin{itemize}
+        \item Update tile colors immediately for instant feedback
+        \item Test word validation with both valid and invalid words
+        \item Verify that colors appear correctly on tiles
+    \end{itemize}
+    
+    \item \textbf{Add \texttt{updateGameState()}}
+    \begin{itemize}
+        \item Handle win/lose detection
+        \item Test by intentionally winning and losing games
+    \end{itemize}
+    
+    \item \textbf{Enhance with advanced features}
+    \begin{itemize}
+        \item Add row completion effects with \texttt{processRowReveal()}
+        \item Implement keyboard color updates
+        \item Add input validation
+        \item Polish the end-game modal
+    \end{itemize}
+    
+    \item \textbf{Handle duplicate letters in \texttt{checkLetter()}}
+    \begin{itemize}
+        \item This is the most complex part - save it for last
+        \item Test with words like "SPEED", "LEVEL", "ALLEY"
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Testing Your Progress}
+At each step, test your implementation:
+\begin{itemize}
+    \item \textbf{Use the debug console:} \texttt{window.debug.revealWord()} shows the target
+    \item \textbf{Try edge cases:} Empty inputs, invalid words, duplicate letters
+    \item \textbf{Check the console:} Look for JavaScript errors or warnings
+    \item \textbf{Test systematically:} Try to win, lose, and play multiple games
+\end{itemize}
+
+\section{Extension Opportunities}
+
+For students seeking additional challenges:
+
+\begin{itemize}[itemsep=0.3em]
+    \item \textbf{Hard Mode}: Revealed hints must be used in subsequent guesses
+    \item \textbf{Daily Words}: Implement a seed-based word selection
+    \item \textbf{Share Results}: Generate shareable emoji grids
+    \item \textbf{Accessibility}: Add screen reader support and keyboard navigation
+    \item \textbf{Mobile Optimization}: Improve touch interactions
+\end{itemize}
+
+\vspace{1em}
+\begin{center}
+\textbf{Good luck, and have fun building your Wordle clone!}
+\end{center}
+
+\end{document} 

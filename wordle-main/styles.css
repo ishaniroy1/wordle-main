@@ -1,0 +1,568 @@
+/* ========================================
+   WORDLE CLONE - CSS STYLES
+   ======================================== */
+
+/* CSS Variables for consistent theming */
+:root {
+    --color-tone-1: #000000;
+    --color-tone-2: #787c7e;
+    --color-tone-3: #878a8c;
+    --color-tone-4: #d3d6da;
+    --color-tone-7: #ffffff;
+    --color-nav-hover: #f6f7f8;
+    --color-success: #6aaa64;
+    --color-present: #c9b458;
+    --color-absent: #787c7e;
+    --color-background: #ffffff;
+    --opacity-50: rgba(255, 255, 255, 0.5);
+}
+
+/* Dark mode support (optional enhancement) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-tone-1: #ffffff;
+        --color-tone-2: #818384;
+        --color-tone-3: #565758;
+        --color-tone-4: #3a3a3c;
+        --color-tone-7: #121213;
+        --color-nav-hover: #2f2f31;
+        --color-background: #121213;
+        --opacity-50: rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-tone-1);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1.4;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: space-between;
+}
+
+/* ========================================
+   HEADER STYLES
+   ======================================== */
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--color-tone-4);
+    margin-bottom: 20px;
+}
+
+.game-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 0.2rem;
+    color: var(--color-tone-1);
+    margin: 0;
+}
+
+.reset-btn {
+    background-color: var(--color-success);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background-color: #5a9a54;
+    transform: scale(1.05);
+}
+
+.reset-btn:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   MESSAGE STYLES
+   ======================================== */
+
+.message {
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    transform: translateY(-10px);
+    opacity: 0;
+}
+
+.message:not(.hidden) {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.message.success {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.message.error {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.message.info {
+    background-color: var(--color-present);
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ========================================
+   GAME BOARD STYLES
+   ======================================== */
+
+.game-board {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 5px;
+    margin: 20px 0;
+    padding: 10px;
+    flex-grow: 1;
+    max-height: 420px;
+}
+
+.tile-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+}
+
+.tile {
+    width: 62px;
+    height: 62px;
+    border: 2px solid var(--color-tone-4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--color-tone-1);
+    background-color: var(--color-background);
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+}
+
+/* Tile States */
+.tile.filled {
+    border-color: var(--color-tone-3);
+    animation: tileTyping 0.1s ease-in-out;
+    transform: scale(1.05);
+}
+
+.tile.correct {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+
+.tile.present {
+    background-color: var(--color-present);
+    border-color: var(--color-present);
+    color: white;
+}
+
+.tile.absent {
+    background-color: var(--color-absent);
+    border-color: var(--color-absent);
+    color: white;
+}
+
+/* Tile Animations */
+@keyframes tileTyping {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.05);
+    }
+}
+
+.tile.flip {
+    animation: flipTile 0.6s ease-in-out forwards;
+}
+
+@keyframes flipTile {
+    0% {
+        transform: rotateX(0deg);
+    }
+    50% {
+        transform: rotateX(-90deg);
+        background-color: var(--color-tone-4);
+    }
+    100% {
+        transform: rotateX(0deg);
+    }
+}
+
+/* Row shake animation for invalid words */
+.tile-row.shake {
+    animation: shake 0.6s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Win celebration animation */
+.tile-row.celebrate .tile {
+    animation: celebrate 0.6s ease-in-out forwards;
+}
+
+@keyframes celebrate {
+    0%, 100% { transform: scale(1) rotateZ(0deg); }
+    25% { transform: scale(1.1) rotateZ(-5deg); }
+    50% { transform: scale(1.2) rotateZ(0deg); }
+    75% { transform: scale(1.1) rotateZ(5deg); }
+}
+
+/* ========================================
+   KEYBOARD STYLES
+   ======================================== */
+
+.keyboard {
+    margin: 20px 0;
+    user-select: none;
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 8px;
+    gap: 6px;
+}
+
+.key {
+    font-family: inherit;
+    font-weight: bold;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    height: 58px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--color-tone-4);
+    color: var(--color-tone-1);
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.1s ease;
+    max-width: 43px;
+}
+
+.key:hover {
+    background-color: var(--color-tone-3);
+    transform: scale(1.05);
+}
+
+.key:active {
+    transform: scale(0.95);
+}
+
+.key.key-large {
+    max-width: 65px;
+    font-size: 12px;
+}
+
+/* Keyboard key states */
+.key.correct {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.key.present {
+    background-color: var(--color-present);
+    color: white;
+}
+
+.key.absent {
+    background-color: var(--color-absent);
+    color: white;
+}
+
+.key svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Key press animation */
+.key.pressed {
+    animation: keyPress 0.1s ease-in-out;
+}
+
+@keyframes keyPress {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+/* ========================================
+   MODAL STYLES
+   ======================================== */
+
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--opacity-50);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--color-background);
+    margin: 15% auto;
+    padding: 0;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid var(--color-tone-4);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-tone-4);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--color-tone-1);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--color-tone-2);
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background-color: var(--color-nav-hover);
+    color: var(--color-tone-1);
+}
+
+.modal-body {
+    padding: 24px;
+    text-align: center;
+}
+
+.modal-body p {
+    margin-bottom: 16px;
+    font-size: 1rem;
+    color: var(--color-tone-2);
+}
+
+.modal-word {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-tone-1);
+    margin: 16px 0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.modal-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-tone-1);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--color-tone-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.play-again-btn {
+    background-color: var(--color-success);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+.play-again-btn:hover {
+    background-color: #5a9a54;
+    transform: scale(1.05);
+}
+
+.play-again-btn:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .game-title {
+        font-size: 2rem;
+    }
+    
+    .tile {
+        width: 52px;
+        height: 52px;
+        font-size: 1.5rem;
+    }
+    
+    .key {
+        height: 48px;
+        max-width: 36px;
+        font-size: 10px;
+    }
+    
+    .key.key-large {
+        max-width: 55px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.no-animation {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Focus styles for accessibility */
+.key:focus,
+.reset-btn:focus,
+.close-btn:focus,
+.play-again-btn:focus {
+    outline: 2px solid var(--color-success);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .tile {
+        border-width: 3px;
+    }
+    
+    .key {
+        border: 2px solid var(--color-tone-1);
+    }
+} 
